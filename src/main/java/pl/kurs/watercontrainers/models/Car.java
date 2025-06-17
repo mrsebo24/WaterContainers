@@ -2,7 +2,7 @@ package pl.kurs.watercontrainers.models;
 
 import java.io.Serializable;
 
-public class Car {
+public class Car implements Serializable {
 
 
 
