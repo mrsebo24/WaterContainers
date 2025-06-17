@@ -1,8 +1,11 @@
 package pl.kurs.watercontrainers.models;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Car implements Serializable {
+    private static final long serialVersionUID = 42L;
+
 
 
 
@@ -28,6 +31,19 @@ public class Car implements Serializable {
 
     public void setModel(String model) {
         this.model = model;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Car car = (Car) o;
+        return Objects.equals(producer, car.producer) && Objects.equals(model, car.model);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(producer, model);
     }
 
     @Override
