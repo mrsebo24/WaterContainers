@@ -4,6 +4,7 @@ import pl.kurs.watercontrainers.exceptions.InvalidCapacityException;
 import pl.kurs.watercontrainers.exceptions.InvalidLevelException;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
