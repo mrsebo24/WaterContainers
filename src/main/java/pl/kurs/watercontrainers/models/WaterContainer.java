@@ -34,20 +34,24 @@ public class WaterContainer implements Serializable {
 
     public void addWater(double water){
         if ((waterLevel + water) > maxCapacity){
-            waterContainerSaveOperationsList.add(new WaterContainerSaveOperations(LocalDateTime.now(), "add", this, water, false));
+            saveOperation("add", water, false);
         }else {
-            waterContainerSaveOperationsList.add(new WaterContainerSaveOperations(LocalDateTime.now(), "add", this, water, true));
+            saveOperation("add", water, true);
             waterLevel += water;
         }
     }
 
     public void removeWater(double water){
         if ((waterLevel - water) < 0){
-            waterContainerSaveOperationsList.add(new WaterContainerSaveOperations(LocalDateTime.now(), "remove", this, water, false));
+            saveOperation("remove", water, false);
         }else {
-            waterContainerSaveOperationsList.add(new WaterContainerSaveOperations(LocalDateTime.now(), "remove", this, water, true));
+            saveOperation("remove", water, true);
             waterLevel -= water;
         }
+    }
+
+    private void saveOperation(String operationName, double water, boolean isSuccess) {
+        waterContainerSaveOperationsList.add(new WaterContainerSaveOperations(LocalDateTime.now(), operationName, this, water, isSuccess));
     }
 
     public String getName() {
