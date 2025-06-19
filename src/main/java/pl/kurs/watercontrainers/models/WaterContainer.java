@@ -4,6 +4,7 @@ import pl.kurs.watercontrainers.exceptions.InvalidCapacityException;
 import pl.kurs.watercontrainers.exceptions.InvalidLevelException;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
 public class WaterContainer implements Serializable {
@@ -12,6 +13,7 @@ public class WaterContainer implements Serializable {
     private String name;
     private double maxCapacity;
     private double waterLevel;
+    private List<WaterContainerSaveOperations> waterContainerSaveOperationsList;
 
     private WaterContainer(String name, double maxCapacity, double waterLevel) {
         this.name = name;
@@ -53,12 +55,13 @@ public class WaterContainer implements Serializable {
         this.waterLevel = waterLevel;
     }
 
+    public List<WaterContainerSaveOperations> getWaterContainerSaveOperationsList() {
+        return waterContainerSaveOperationsList;
+    }
 
-
-
-
-
-
+    public void setWaterContainerSaveOperationsList(List<WaterContainerSaveOperations> waterContainerSaveOperationsList) {
+        this.waterContainerSaveOperationsList = waterContainerSaveOperationsList;
+    }
 
     @Override
     public boolean equals(Object o) {
