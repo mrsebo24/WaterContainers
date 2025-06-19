@@ -37,6 +37,16 @@ public class WaterContainer implements Serializable {
             waterContainerSaveOperationsList.add(new WaterContainerSaveOperations(LocalDateTime.now(), "add", this, water, false));
         }else {
             waterContainerSaveOperationsList.add(new WaterContainerSaveOperations(LocalDateTime.now(), "add", this, water, true));
+            waterLevel += water;
+        }
+    }
+
+    public void removeWater(double water){
+        if ((waterLevel - water) < 0){
+            waterContainerSaveOperationsList.add(new WaterContainerSaveOperations(LocalDateTime.now(), "remove", this, water, false));
+        }else {
+            waterContainerSaveOperationsList.add(new WaterContainerSaveOperations(LocalDateTime.now(), "remove", this, water, true));
+            waterLevel -= water;
         }
     }
 
