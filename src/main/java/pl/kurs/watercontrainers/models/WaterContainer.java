@@ -32,6 +32,14 @@ public class WaterContainer implements Serializable {
         return new WaterContainer(name, maxCapacity, waterLevel);
     }
 
+    public void addWater(double water){
+        if ((waterLevel + water) > maxCapacity){
+            waterContainerSaveOperationsList.add(new WaterContainerSaveOperations(LocalDateTime.now(), "add", this, water, false));
+        }else {
+            waterContainerSaveOperationsList.add(new WaterContainerSaveOperations(LocalDateTime.now(), "add", this, water, true));
+        }
+    }
+
     public String getName() {
         return name;
     }
