@@ -50,6 +50,17 @@ public class WaterContainer implements Serializable {
         }
     }
 
+    public void exchangeWater(WaterContainer waterContainer, double water){
+        if ((waterContainer.getWaterLevel() - water) < 0) {
+            waterContainer.removeWater(water);
+        }else if ((waterLevel + water) > maxCapacity) {
+            addWater(water);
+        }else {
+            waterContainer.removeWater(water);
+            addWater(water);
+        }
+    }
+
     private void saveOperation(String operationName, double water, boolean isSuccess) {
         waterContainerSaveOperationsList.add(new WaterContainerSaveOperations(LocalDateTime.now(), operationName, this, water, isSuccess));
     }
