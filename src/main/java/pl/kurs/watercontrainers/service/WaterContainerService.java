@@ -16,14 +16,15 @@ public class WaterContainerService {
     public Optional<WaterContainer> findWaterContainerMaxCapacity(){
         if(waterContainers.isEmpty()) return Optional.empty();
 
-        WaterContainer result = waterContainers.get(0);
+        WaterContainer result = waterContainers.getFirst();
         for (WaterContainer waterContainer : waterContainers) {
-            if (waterContainer.getMaxCapacity() > result.getMaxCapacity()){
+            if (waterContainer.getWaterLevel() > result.getWaterLevel()){
                 result = waterContainer;
             }
         }return Optional.of(result);
     }
     //- znalezc zbiornik ktory jest najbardziej zapelniony
+
     //- znalezc wszystkie puste zbiorniki.
     //- pozwalają znaleźć zbiornik na którym było najwiecej operacji zakonczonych niepowodzeniem
     //- pozwalają znaleźć zbiornik w którym było najwięcej operacji danego typu (typ podajemy jako argument metody)
