@@ -5,6 +5,7 @@ import pl.kurs.watercontrainers.exceptions.InvalidLevelException;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -20,6 +21,7 @@ public class WaterContainer implements Serializable {
         this.name = name;
         this.maxCapacity = maxCapacity;
         this.waterLevel = waterLevel;
+        this.waterContainerSaveOperationsList = new ArrayList<>();
     }
 
     public static WaterContainer create(String name, double maxCapacity, double waterLevel){
