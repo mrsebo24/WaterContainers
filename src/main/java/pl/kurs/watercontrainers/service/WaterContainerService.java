@@ -52,7 +52,29 @@ public class WaterContainerService {
     }
 
     //- pozwalają znaleźć zbiornik w którym było najwięcej operacji danego typu (typ podajemy jako argument metody)
+    public Optional<WaterContainer> findWaterContainerWithMostUsedOperation(String operationName){
+        if(waterContainers.isEmpty()) return Optional.empty();
+        int counter = 0;
+        WaterContainer result = waterContainers.getFirst();
 
+        for (WaterContainer waterContainer : waterContainers) {
+            int counterMostUsedOperation = counterMostUsedOperation(operationName, waterContainer);
+            if (counterMostUsedOperation > counter){
+                result = waterContainer;
+                counter = counterMostUsedOperation;
+            }
+        }return Optional.of(result);
+    }
+
+    private int counterMostUsedOperation(String operationName, WaterContainer waterContainer) {
+        int counter = 0;
+        for (WaterContainerSaveOperations waterContainerSaveOperations : waterContainer.getWaterContainerSaveOperationsList()) {
+            if (waterContainerSaveOperations.getOperationName().equals(operationName)){
+                counter++;
+            }
+        }
+        return counter;
+    }
 
 
     private int counterNegativeOperation(WaterContainer waterContainer) {
