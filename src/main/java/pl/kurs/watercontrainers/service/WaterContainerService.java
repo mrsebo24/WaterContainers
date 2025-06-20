@@ -1,6 +1,7 @@
 package pl.kurs.watercontrainers.service;
 
 import pl.kurs.watercontrainers.models.WaterContainer;
+import pl.kurs.watercontrainers.models.WaterContainerSaveOperations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,5 +37,30 @@ public class WaterContainerService {
         }return emptyWaterContainer;
     }
     //- pozwalają znaleźć zbiornik na którym było najwiecej operacji zakonczonych niepowodzeniem
+    public Optional<WaterContainer> findWaterContainerWithMostNegativeOperation(){
+        if(waterContainers.isEmpty()) return Optional.empty();
+        int counter = 0;
+        WaterContainer result = waterContainers.getFirst();
+
+        for (WaterContainer waterContainer : waterContainers) {
+            int counterNegativeOperation = counterNegativeOperation(waterContainer);
+            if (counterNegativeOperation > counter){
+                result = waterContainer;
+                counter = counterNegativeOperation;
+            }
+        }return Optional.of(result);
+    }
+
     //- pozwalają znaleźć zbiornik w którym było najwięcej operacji danego typu (typ podajemy jako argument metody)
+
+
+
+    private int counterNegativeOperation(WaterContainer waterContainer) {
+        int counter = 0;
+        for (WaterContainerSaveOperations waterContainerSaveOperations : waterContainer.getWaterContainerSaveOperationsList()) {
+            if (!waterContainerSaveOperations.isSuccess()){
+                counter++;
+            }
+        }return counter;
+    }
 }
