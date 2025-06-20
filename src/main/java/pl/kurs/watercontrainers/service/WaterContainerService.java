@@ -2,6 +2,7 @@ package pl.kurs.watercontrainers.service;
 
 import pl.kurs.watercontrainers.models.WaterContainer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,8 +25,16 @@ public class WaterContainerService {
         }return Optional.of(result);
     }
     //- znalezc zbiornik ktory jest najbardziej zapelniony
-
     //- znalezc wszystkie puste zbiorniki.
+    public List<WaterContainer> findAllEmptyWaterContainer(){
+        if(waterContainers.isEmpty()) return waterContainers;
+        List<WaterContainer> emptyWaterContainer = new ArrayList<>();
+        for (WaterContainer waterContainer : waterContainers) {
+            if (waterContainer.getWaterLevel() == 0){
+                emptyWaterContainer.add(waterContainer);
+            }
+        }return emptyWaterContainer;
+    }
     //- pozwalają znaleźć zbiornik na którym było najwiecej operacji zakonczonych niepowodzeniem
     //- pozwalają znaleźć zbiornik w którym było najwięcej operacji danego typu (typ podajemy jako argument metody)
 }
