@@ -1,39 +1,38 @@
 package pl.kurs.watercontrainers.models;
 
-import java.time.LocalDateTime;
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 //datę i czas jej wykonania, jej nazwę, zbiornik na którym była ona wykonana oraz ilość wody jaka była brana pod uwagę, oraz to czy operacja się powiodła czy nie.
-public class WaterContainerSaveOperations {
-    private LocalDateTime localDateTime;
-    private String operationName;
+public class OperationLog {
+    private Timestamp timestamp;
+    private OperationType operationType;
     private WaterContainer waterContainer;
     private double waterAmount;
     private boolean isSuccess;
 
-    public WaterContainerSaveOperations(LocalDateTime localDateTime, String operationName, WaterContainer waterContainer, double waterAmount, boolean isSuccess) {
-        this.localDateTime = localDateTime;
-        this.operationName = operationName;
+    public OperationLog(Timestamp timestamp, OperationType operationType, WaterContainer waterContainer, double waterAmount, boolean isSuccess) {
+        this.timestamp = timestamp;
+        this.operationType = operationType;
         this.waterContainer = waterContainer;
         this.waterAmount = waterAmount;
         this.isSuccess = isSuccess;
     }
 
-    public LocalDateTime getLocalDateTime() {
-        return localDateTime;
+    public Timestamp getTimestamp() {
+        return timestamp;
     }
 
-    public void setLocalDateTime(LocalDateTime localDateTime) {
-        this.localDateTime = localDateTime;
+    public void setTimestamp(Timestamp timestamp) {
+        this.timestamp = timestamp;
     }
 
-    public String getOperationName() {
-        return operationName;
+    public OperationType getOperationType() {
+        return operationType;
     }
 
-    public void setOperationName(String operationName) {
-        this.operationName = operationName;
+    public void setOperationType(OperationType operationType) {
+        this.operationType = operationType;
     }
 
     public WaterContainer getWaterContainer() {
@@ -63,23 +62,27 @@ public class WaterContainerSaveOperations {
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        WaterContainerSaveOperations that = (WaterContainerSaveOperations) o;
-        return Double.compare(waterAmount, that.waterAmount) == 0 && isSuccess == that.isSuccess && Objects.equals(localDateTime, that.localDateTime) && Objects.equals(operationName, that.operationName);
+        OperationLog that = (OperationLog) o;
+        return Double.compare(waterAmount, that.waterAmount) == 0 && isSuccess == that.isSuccess && Objects.equals(timestamp, that.timestamp) && Objects.equals(operationType, that.operationType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(localDateTime, operationName, waterAmount, isSuccess);
+        return Objects.hash(timestamp, operationType, waterAmount, isSuccess);
     }
 
     @Override
     public String toString() {
-        return "WaterContainerSaveOperations{" +
-                "localDateTime=" + localDateTime +
-                ", operationName='" + operationName + '\'' +
+        return "OperationLog{" +
+                "timestamp=" + timestamp +
+                ", operationType=" + operationType +
                 ", waterContainer=" + waterContainer +
                 ", waterAmount=" + waterAmount +
                 ", isSuccess=" + isSuccess +
                 '}';
+    }
+
+    public enum OperationType{
+        ADD_WATER, REMOVE_WATER
     }
 }

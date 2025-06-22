@@ -1,75 +1,100 @@
 package pl.kurs.watercontrainers.service;
 
 import pl.kurs.watercontrainers.models.WaterContainer;
-import pl.kurs.watercontrainers.models.WaterContainerSaveOperations;
-
+import pl.kurs.watercontrainers.models.OperationLog;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class WaterContainerService {
-    private List<WaterContainer> waterContainers;
+    private final List<WaterContainer> waterContainers;
 
     public WaterContainerService(List<WaterContainer> waterContainers) {
-        this.waterContainers = waterContainers;
+        this.waterContainers = removeAllNullObjectsFromList(waterContainers);
     }
 
-    //- znalezc zbiornik w ktorym jest najwiecej wody
-    public Optional<WaterContainer> findWaterContainerMaxCapacity(){
-        if(waterContainers.isEmpty()) return Optional.empty();
-
-        WaterContainer result = waterContainers.getFirst();
+    private List<WaterContainer> removeAllNullObjectsFromList(List<WaterContainer> waterContainers) {
+        List<WaterContainer> list1 = new ArrayList<>();
         for (WaterContainer waterContainer : waterContainers) {
-            if (waterContainer.getWaterLevel() > result.getWaterLevel()){
-                result = waterContainer;
+            if (waterContainer != null){
+                list1.add(waterContainer);
             }
-        }return Optional.of(result);
+        }return list1;
     }
-    //- znalezc zbiornik ktory jest najbardziej zapelniony
-    //- znalezc wszystkie puste zbiorniki.
-    public List<WaterContainer> findAllEmptyWaterContainer(){
-        if(waterContainers.isEmpty()) return waterContainers;
+
+    public Optional<WaterContainer> findContainerWithTheBiggestAmountOfWater() {
+        if (waterContainers.isEmpty()) return Optional.empty();
+        WaterContainer maxWaterContainer = waterContainers.getFirst();
+        for (WaterContainer waterContainer : waterContainers) {
+            if (waterContainer.getWaterLevel() > maxWaterContainer.getWaterLevel()){
+                maxWaterContainer = waterContainer;
+            }
+        }
+        return Optional.ofNullable(maxWaterContainer);
+    }
+
+    public Optional<WaterContainer> findMostFilledWaterContainer(){
+        if (waterContainers.isEmpty()) return Optional.empty();
+        WaterContainer mostFilledWaterContainer = waterContainers.getFirst();
+        double freeSpace = mostFilledWaterContainer.getWaterLevel() - mostFilledWaterContainer.getMaxCapacity();
+        for (WaterContainer waterContainer : waterContainers) {
+            double currentFreeSpace = waterContainer.getWaterLevel() - waterContainer.getMaxCapacity();
+            if (freeSpace < currentFreeSpace){
+                freeSpace = currentFreeSpace;
+                mostFilledWaterContainer = waterContainer;
+            }
+        }return Optional.of(mostFilledWaterContainer);
+    }
+
+    public List<WaterContainer> findAllEmptyWaterLevelInWaterContainer() {
+        if (waterContainers.isEmpty()) return waterContainers;
         List<WaterContainer> emptyWaterContainer = new ArrayList<>();
         for (WaterContainer waterContainer : waterContainers) {
-            if (waterContainer.getWaterLevel() == 0){
+            if (waterContainer.getWaterLevel() == 0) {
                 emptyWaterContainer.add(waterContainer);
             }
-        }return emptyWaterContainer;
+        }
+        return emptyWaterContainer;
     }
-    //- pozwalają znaleźć zbiornik na którym było najwiecej operacji zakonczonych niepowodzeniem
-    public Optional<WaterContainer> findWaterContainerWithMostNegativeOperation(){
-        if(waterContainers.isEmpty()) return Optional.empty();
+
+    public Optional<WaterContainer> findWaterContainerWithMostNegativeOperation() {
+        if (waterContainers.isEmpty()) return Optional.empty();
         int counter = 0;
         WaterContainer result = waterContainers.getFirst();
 
         for (WaterContainer waterContainer : waterContainers) {
-            int counterNegativeOperation = counterNegativeOperation(waterContainer);
-            if (counterNegativeOperation > counter){
-                result = waterContainer;
-                counter = counterNegativeOperation;
+            if (!waterContainer.getWaterContainerSaveOperationsList().isEmpty()){
+                int counterNegativeOperation = counterNegativeOperation(waterContainer);
+                if (counterNegativeOperation > counter) {
+                    result = waterContainer;
+                    counter = counterNegativeOperation;
+                }
             }
-        }return Optional.of(result);
+        }
+        return Optional.of(result);
     }
 
-    //- pozwalają znaleźć zbiornik w którym było najwięcej operacji danego typu (typ podajemy jako argument metody)
-    public Optional<WaterContainer> findWaterContainerWithMostUsedOperation(String operationName){
-        if(waterContainers.isEmpty()) return Optional.empty();
+    public Optional<WaterContainer> findWaterContainerWithMostUsedOperation(OperationLog.OperationType operationType) {
+        if (waterContainers.isEmpty()) return Optional.empty();
         int counter = 0;
         WaterContainer result = waterContainers.getFirst();
 
         for (WaterContainer waterContainer : waterContainers) {
-            int counterMostUsedOperation = counterMostUsedOperation(operationName, waterContainer);
-            if (counterMostUsedOperation > counter){
-                result = waterContainer;
-                counter = counterMostUsedOperation;
+            if (!waterContainer.getWaterContainerSaveOperationsList().isEmpty()){
+                int counterMostUsedOperation = counterMostUsedOperation(operationType, waterContainer);
+                if (counterMostUsedOperation > counter) {
+                    result = waterContainer;
+                    counter = counterMostUsedOperation;
+                }
             }
-        }return Optional.of(result);
+        }
+        return Optional.of(result);
     }
 
-    private int counterMostUsedOperation(String operationName, WaterContainer waterContainer) {
+    private int counterMostUsedOperation(OperationLog.OperationType operationType, WaterContainer waterContainer) {
         int counter = 0;
-        for (WaterContainerSaveOperations waterContainerSaveOperations : waterContainer.getWaterContainerSaveOperationsList()) {
-            if (waterContainerSaveOperations.getOperationName().equals(operationName)){
+        for (OperationLog operationLog : waterContainer.getWaterContainerSaveOperationsList()) {
+            if (operationLog.getOperationType().equals(operationType)) {
                 counter++;
             }
         }
@@ -79,10 +104,11 @@ public class WaterContainerService {
 
     private int counterNegativeOperation(WaterContainer waterContainer) {
         int counter = 0;
-        for (WaterContainerSaveOperations waterContainerSaveOperations : waterContainer.getWaterContainerSaveOperationsList()) {
-            if (!waterContainerSaveOperations.isSuccess()){
+        for (OperationLog operationLog : waterContainer.getWaterContainerSaveOperationsList()) {
+            if (!operationLog.isSuccess()) {
                 counter++;
             }
-        }return counter;
+        }
+        return counter;
     }
 }
