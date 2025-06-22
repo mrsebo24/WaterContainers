@@ -4,6 +4,8 @@ import pl.kurs.watercontrainers.exceptions.InvalidCapacityException;
 import pl.kurs.watercontrainers.exceptions.InvalidLevelException;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,16 +17,15 @@ public class WaterContainer implements Serializable {
     private String name;
     private double maxCapacity;
     private double waterLevel;
-    private List<WaterContainerSaveOperations> waterContainerSaveOperationsList;
+    private final List<OperationLog> operationLogList = new ArrayList<>();
 
     private WaterContainer(String name, double maxCapacity, double waterLevel) {
         this.name = name;
         this.maxCapacity = maxCapacity;
         this.waterLevel = waterLevel;
-        this.waterContainerSaveOperationsList = new ArrayList<>();
     }
 
-    public static WaterContainer create(String name, double maxCapacity, double waterLevel){
+    public static WaterContainer create(String name, double maxCapacity, double waterLevel) {
         if (maxCapacity <= 0) {
             throw new InvalidCapacityException("Max capacity must by more than 0");
         }
@@ -34,37 +35,49 @@ public class WaterContainer implements Serializable {
         return new WaterContainer(name, maxCapacity, waterLevel);
     }
 
-    public void addWater(double water){
-        if ((waterLevel + water) > maxCapacity){
-            saveOperation("add", water, false);
+    public void addWater(double value) {
+        boolean isSuccess;
+        if ((this.waterLevel + value) > maxCapacity) {
+            isSuccess = false;
+        } else {
+            this.waterLevel += value;
+            isSuccess = true;
+        }
+        saveOperation(OperationLog.OperationType.ADD_WATER, value, isSuccess);
+    }
+
+    public void removeWater(double value) {
+        boolean isSuccess;
+        if ((this.waterLevel - value) < 0) {
+            isSuccess = false;
+        } else {
+            isSuccess = true;
+            this.waterLevel -= value;
+        }
+        saveOperation(OperationLog.OperationType.REMOVE_WATER, value, isSuccess);
+    }
+
+    public void exchangeWater(WaterContainer sourceContainer, double value) {
+        if (!sourceContainer.removeIsPossible(value) || !this.addIsPossible(value)){
+            sourceContainer.saveOperation(OperationLog.OperationType.REMOVE_WATER, value, false);
+            this.saveOperation(OperationLog.OperationType.ADD_WATER, value, false);
         }else {
-            saveOperation("add", water, true);
-            waterLevel += water;
+            sourceContainer.removeWater(value);
+            this.addWater(value);
         }
     }
 
-    public void removeWater(double water){
-        if ((waterLevel - water) < 0){
-            saveOperation("remove", water, false);
-        }else {
-            saveOperation("remove", water, true);
-            waterLevel -= water;
-        }
+    private boolean removeIsPossible(double value){
+        return !(waterLevel - value < 0);
     }
 
-    public void exchangeWater(WaterContainer waterContainer, double water){
-        if ((waterContainer.getWaterLevel() - water) < 0) {
-            waterContainer.removeWater(water);
-        }else if ((waterLevel + water) > maxCapacity) {
-            addWater(water);
-        }else {
-            waterContainer.removeWater(water);
-            addWater(water);
-        }
+    private boolean addIsPossible(double value){
+        return !(waterLevel + value > maxCapacity);
     }
 
-    private void saveOperation(String operationName, double water, boolean isSuccess) {
-        waterContainerSaveOperationsList.add(new WaterContainerSaveOperations(LocalDateTime.now(), operationName, this, water, isSuccess));
+
+    private void saveOperation(OperationLog.OperationType operationType, double water, boolean isSuccess) {
+        operationLogList.add(new OperationLog(Timestamp.from(Instant.now()), operationType, this, water, isSuccess));
     }
 
     public String getName() {
@@ -91,13 +104,10 @@ public class WaterContainer implements Serializable {
         this.waterLevel = waterLevel;
     }
 
-    public List<WaterContainerSaveOperations> getWaterContainerSaveOperationsList() {
-        return waterContainerSaveOperationsList;
+    public List<OperationLog> getWaterContainerSaveOperationsList() {
+        return operationLogList;
     }
 
-    public void setWaterContainerSaveOperationsList(List<WaterContainerSaveOperations> waterContainerSaveOperationsList) {
-        this.waterContainerSaveOperationsList = waterContainerSaveOperationsList;
-    }
 
     @Override
     public boolean equals(Object o) {
