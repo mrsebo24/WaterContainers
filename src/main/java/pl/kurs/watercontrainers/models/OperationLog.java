@@ -3,7 +3,6 @@ package pl.kurs.watercontrainers.models;
 import java.sql.Timestamp;
 import java.util.Objects;
 
-//datę i czas jej wykonania, jej nazwę, zbiornik na którym była ona wykonana oraz ilość wody jaka była brana pod uwagę, oraz to czy operacja się powiodła czy nie.
 public class OperationLog {
     private Timestamp timestamp;
     private OperationType operationType;

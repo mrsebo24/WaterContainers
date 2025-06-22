@@ -1,13 +1,9 @@
 package pl.kurs.watercontrainers.app;
 
-import pl.kurs.watercontrainers.models.OperationLog;
 import pl.kurs.watercontrainers.models.WaterContainer;
 import pl.kurs.watercontrainers.service.WaterContainerService;
-
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+
 
 public class App {
     public static void main(String[] args) {
